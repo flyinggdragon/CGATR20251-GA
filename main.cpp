@@ -71,9 +71,9 @@ int main() {
 	ObjReader objReader = ObjReader();
 	Obj3D* obj = new Obj3D;
 
-	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR-20251\\Object\\Objs\\mesa\\mesa01.obj");
-	string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR-20251\\Object\\Objs\\teapot\\teapot1.obj");
-	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR-20251\\Object\\Objs\\piramide\\pyramid.obj");
+	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Objs\\mesa\\mesa01.obj");
+	string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Objs\\teapot\\teapot1.obj");
+	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Objs\\piramide\\pyramid.obj");
 
 	Mesh* mesh = objReader.readMesh(data);
 	obj->mesh = mesh;
