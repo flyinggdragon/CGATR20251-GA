@@ -147,6 +147,9 @@
     <ClInclude Include="Obj3D.h" />
     <ClInclude Include="ObjReader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cena.scene" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

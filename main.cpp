@@ -48,7 +48,7 @@ int main() {
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Camera", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "SceneDisplayer", nullptr, nullptr);
 
 	if (!window) {
 		cerr << "Falha ao criar janela GLFW" << endl;
@@ -69,16 +69,64 @@ int main() {
 	vector<Obj3D*> objects;
 
 	ObjReader objReader = ObjReader();
-	Obj3D* obj = new Obj3D;
+	Obj3D* teapot = new Obj3D;
+	Obj3D* table = new Obj3D;
+	Obj3D* pyramid = new Obj3D;
+	Obj3D* dragon = new Obj3D;
+	Obj3D* torreDiPisa = new Obj3D;
+	Obj3D* trout = new Obj3D;
+	Obj3D* cube = new Obj3D;
 
-	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\mesa\\mesa01.obj");
-	string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\teapot\\teapot1.obj");
-	//string data = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\piramide\\pyramid.obj");
+	string tableData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\mesa\\mesa01.obj");
+	string teapotData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\teapot\\teapot1.obj");
+	string pyramidData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\piramide\\pyramid.obj");
+	string dragonData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\dragon\\dragon.obj");
+	string torreDiPisaData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\torredipisa\\torredipisa.obj");
+	string troutData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\trout\\trout.obj");
+	string cubeData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\cubo\\cubo1.obj");
 
-	Mesh* mesh = objReader.readMesh(data);
-	obj->mesh = mesh;
+	// Temporário até a criação do arquivo de cena.
+	Mesh* mesh;
+	
+	mesh = objReader.readMesh(teapotData);
+	teapot->mesh = mesh;
+	teapot->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+	teapot->transform = glm::translate(teapot->transform, glm::vec3(0.0f, 10.0f, 0.0f));
 
-	objects.push_back(obj);
+	mesh = objReader.readMesh(tableData);
+	table->mesh = mesh;
+	table->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+
+	mesh = objReader.readMesh(pyramidData);
+	pyramid->mesh = mesh;
+	pyramid->transform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+	pyramid->transform = glm::translate(pyramid->transform, glm::vec3(0.0f, 0.0f, -12.0f));
+
+	mesh = objReader.readMesh(dragonData);
+	dragon->mesh = mesh;
+	dragon->transform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0f, 1.0f));
+	dragon->transform = glm::translate(dragon->transform, glm::vec3(0.0f, 4.0f, -10.0f));
+
+	mesh = objReader.readMesh(torreDiPisaData);
+	torreDiPisa->mesh = mesh;
+	torreDiPisa->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.06f));
+	torreDiPisa->transform = glm::translate(torreDiPisa->transform, glm::vec3(45.1f, -0.1f, -78.0f));
+	
+	mesh = objReader.readMesh(troutData);
+	trout->mesh = mesh;
+	trout->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+	
+	mesh = objReader.readMesh(cubeData);
+	cube->mesh = mesh;
+	cube->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+
+	objects.push_back(teapot);
+	objects.push_back(table);
+	objects.push_back(pyramid);
+	objects.push_back(dragon);
+	objects.push_back(torreDiPisa);
+	objects.push_back(trout);
+	objects.push_back(cube);
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vShader, nullptr);
@@ -129,13 +177,13 @@ int main() {
 			cameraPosition += cameraSpeed * direction;
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 			cameraPosition -= cameraSpeed * direction;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			cameraPosition -= right * cameraSpeed;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			cameraPosition -= right * cameraSpeed;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 			cameraPosition += right * cameraSpeed;
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
-		}
+		
 
 		cameraTarget = cameraPosition + direction;
 
@@ -145,16 +193,15 @@ int main() {
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::scale(trans, glm::vec3(0.1f, 0.1f, 0.1f));
+		for (Obj3D* obj : objects) {
+			int matrixLocation = glGetUniformLocation(shaderProgram, "transform");
+			glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, glm::value_ptr(obj->transform));
 
-		int matrixLocation = glGetUniformLocation(shaderProgram, "transform");
-		glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, glm::value_ptr(trans));
-
-		mesh = obj->mesh;
-		for (Group* g : mesh->groups) {
-			glBindVertexArray(g->VAO);
-			glDrawArrays(GL_TRIANGLES, 0, g->numVertices);
+			mesh = obj->mesh;
+			for (Group* g : mesh->groups) {
+				glBindVertexArray(g->VAO);
+				glDrawArrays(GL_TRIANGLES, 0, g->numVertices);
+			}
 		}
 
 		glfwSwapBuffers(window);
