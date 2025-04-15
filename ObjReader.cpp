@@ -10,11 +10,9 @@
 
 using namespace std;
 
-ObjReader::ObjReader() {
-}
+ObjReader::ObjReader() { }
 
-ObjReader::~ObjReader() {
-}
+ObjReader::~ObjReader() { }
 
 Mesh* ObjReader::readMesh(string content) {
     Mesh* mesh = new Mesh;

@@ -1,0 +1,42 @@
+--Objects
+obj table
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\mesa\mesa01.obj
+sca 0.1 0.1 0.1
+pos 0.0 0.0 0.0
+del 0
+
+obj teapot
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\teapot\teapot1.obj
+sca 0.1 0.1 0.1
+pos 0.0 10.0 0.0
+del 1
+
+obj pyramid
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\piramide\pyramid.obj
+sca 1.0 1.0 1.0
+pos 0.0 0.0 -12.0
+del 0
+
+obj dragon
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\dragon\dragon.obj
+sca 1.0 1.0 1.0
+pos 0.0 4.0 -10.0
+del 1
+
+obj pisatower
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\torredipisa\torredipisa.obj
+sca 0.06 0.06 0.06
+pos 45.1 -0.1 -78.0
+del 0
+
+obj trout
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\trout\trout.obj
+sca 1.0 1.0 1.0
+pos 0.0 0.0 0.0
+del 1
+
+obj cube
+loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\cubo\cubo1.obj
+sca 0.1 0.1 0.1
+pos 0.0 0.0 0.0
+del 0

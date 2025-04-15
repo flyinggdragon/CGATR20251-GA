@@ -10,6 +10,7 @@
 #include"Face.h"
 #include"Group.h"
 #include"Mesh.h"
+#include"SceneReader.h"
 
 using namespace std;
 
@@ -66,67 +67,10 @@ int main() {
 
 	glViewport(0, 0, 800, 600);
 
-	vector<Obj3D*> objects;
+	SceneReader sceneReader = SceneReader();
+	string sceneData = sceneReader.readScene("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\GrauA\\cena.scene");
 
-	ObjReader objReader = ObjReader();
-	Obj3D* teapot = new Obj3D;
-	Obj3D* table = new Obj3D;
-	Obj3D* pyramid = new Obj3D;
-	Obj3D* dragon = new Obj3D;
-	Obj3D* torreDiPisa = new Obj3D;
-	Obj3D* trout = new Obj3D;
-	Obj3D* cube = new Obj3D;
-
-	string tableData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\mesa\\mesa01.obj");
-	string teapotData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\teapot\\teapot1.obj");
-	string pyramidData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\piramide\\pyramid.obj");
-	string dragonData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\dragon\\dragon.obj");
-	string torreDiPisaData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\torredipisa\\torredipisa.obj");
-	string troutData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\trout\\trout.obj");
-	string cubeData = objReader.readObj("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\Grau A\\Objs\\cubo\\cubo1.obj");
-
-	// Temporário até a criação do arquivo de cena.
-	Mesh* mesh;
-	
-	mesh = objReader.readMesh(teapotData);
-	teapot->mesh = mesh;
-	teapot->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
-	teapot->transform = glm::translate(teapot->transform, glm::vec3(0.0f, 10.0f, 0.0f));
-
-	mesh = objReader.readMesh(tableData);
-	table->mesh = mesh;
-	table->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
-
-	mesh = objReader.readMesh(pyramidData);
-	pyramid->mesh = mesh;
-	pyramid->transform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-	pyramid->transform = glm::translate(pyramid->transform, glm::vec3(0.0f, 0.0f, -12.0f));
-
-	mesh = objReader.readMesh(dragonData);
-	dragon->mesh = mesh;
-	dragon->transform = glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0f, 1.0f));
-	dragon->transform = glm::translate(dragon->transform, glm::vec3(0.0f, 4.0f, -10.0f));
-
-	mesh = objReader.readMesh(torreDiPisaData);
-	torreDiPisa->mesh = mesh;
-	torreDiPisa->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.06f, 0.06f, 0.06f));
-	torreDiPisa->transform = glm::translate(torreDiPisa->transform, glm::vec3(45.1f, -0.1f, -78.0f));
-	
-	mesh = objReader.readMesh(troutData);
-	trout->mesh = mesh;
-	trout->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
-	
-	mesh = objReader.readMesh(cubeData);
-	cube->mesh = mesh;
-	cube->transform = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
-
-	objects.push_back(teapot);
-	objects.push_back(table);
-	objects.push_back(pyramid);
-	objects.push_back(dragon);
-	objects.push_back(torreDiPisa);
-	objects.push_back(trout);
-	objects.push_back(cube);
+	vector<Obj3D*> objects = sceneReader.getObjects(sceneData);
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vShader, nullptr);
@@ -197,8 +141,7 @@ int main() {
 			int matrixLocation = glGetUniformLocation(shaderProgram, "transform");
 			glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, glm::value_ptr(obj->transform));
 
-			mesh = obj->mesh;
-			for (Group* g : mesh->groups) {
+			for (Group* g : obj->mesh->groups) {
 				glBindVertexArray(g->VAO);
 				glDrawArrays(GL_TRIANGLES, 0, g->numVertices);
 			}
@@ -214,8 +157,4 @@ int main() {
 	glfwTerminate();
 
 	return 0;
-}
-
-void drawScene() {
-
 }
