@@ -1,42 +1,55 @@
---Objects
+--Viewport
+view 800 600
+
+--Lista de Objetos
+
+--Novo Obj
 obj table
+
+--Localização
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\mesa\mesa01.obj
+
+--Escala
 sca 0.1 0.1 0.1
+
+--Posição
 pos 0.0 0.0 0.0
-del 0
+
+--Eliminável?
+del false
 
 obj teapot
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\teapot\teapot1.obj
 sca 0.1 0.1 0.1
 pos 0.0 10.0 0.0
-del 1
+del true
 
 obj pyramid
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\piramide\pyramid.obj
 sca 1.0 1.0 1.0
 pos 0.0 0.0 -12.0
-del 0
+del false
 
 obj dragon
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\dragon\dragon.obj
 sca 1.0 1.0 1.0
 pos 0.0 4.0 -10.0
-del 1
+del true
 
 obj pisatower
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\torredipisa\torredipisa.obj
 sca 0.06 0.06 0.06
 pos 45.1 -0.1 -78.0
-del 0
+del false
 
 obj trout
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\trout\trout.obj
 sca 1.0 1.0 1.0
 pos 0.0 0.0 0.0
-del 1
+del true
 
 obj cube
 loc C:\Users\Acer\Documents\GitHub\CGATR20251\GrauA\Objs\cubo\cubo1.obj
 sca 0.1 0.1 0.1
 pos 0.0 0.0 0.0
-del 0
+del false

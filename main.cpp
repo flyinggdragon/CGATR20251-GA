@@ -11,6 +11,7 @@
 #include"Group.h"
 #include"Mesh.h"
 #include"SceneReader.h"
+#include"Camera.h"
 
 using namespace std;
 
@@ -65,22 +66,19 @@ int main() {
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
-
 	SceneReader sceneReader = SceneReader();
 	string sceneData = sceneReader.readScene("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\GrauA\\cena.scene");
-
 	vector<Obj3D*> objects = sceneReader.getObjects(sceneData);
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vShader, nullptr);
 	glCompileShader(vertexShader);
 
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fShader, nullptr);
 	glCompileShader(fragmentShader);
 
-	unsigned int shaderProgram = glCreateProgram();
+	GLuint shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
@@ -90,49 +88,26 @@ int main() {
 
 	glUseProgram(shaderProgram);
 
-	glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 cameraDirection = glm::normalize(cameraTarget - cameraPosition);
-
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-
-	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-	GLfloat cameraSpeed = 0.005f;
-
-	glm::mat4 view;
-	int viewLocation = glGetUniformLocation(shaderProgram, "view");
-
-	glm::mat4 proj = glm::mat4(1.0f);
-	proj = glm::perspective(glm::radians(90.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-
-	int projLocation = glGetUniformLocation(shaderProgram, "projection");
-	glUniformMatrix4fv(projLocation, 1, GL_FALSE, glm::value_ptr(proj));
-
+	Camera camera = Camera(WIDTH, HEIGHT, shaderProgram);
+	
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-		glm::vec3 direction = glm::normalize(cameraTarget - cameraPosition);
-		glm::vec3 right = glm::normalize(glm::cross(up, direction));
-		cameraUp = glm::cross(direction, right);
-
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			cameraPosition += cameraSpeed * direction;
+			camera.position += camera.speed * camera.direction;
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			cameraPosition -= cameraSpeed * direction;
+			camera.position -= camera.speed * camera.direction;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			cameraPosition -= right * cameraSpeed;
+			camera.position -= camera.right * camera.speed;
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			cameraPosition += right * cameraSpeed;
+			camera.position += camera.right * camera.speed;
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
 		
+		camera.target = camera.position + camera.direction;
 
-		cameraTarget = cameraPosition + direction;
-
-		view = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-		glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+		camera.view = glm::lookAt(camera.position, camera.target, camera.up);
+		glUniformMatrix4fv(camera.viewLocation, 1, GL_FALSE, glm::value_ptr(camera.view));
 
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

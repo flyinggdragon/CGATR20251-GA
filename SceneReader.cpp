@@ -50,10 +50,22 @@ vector<Obj3D*> SceneReader::getObjects(string content) {
         string token;
         sline >> token;
 
-        if (token == "obj") {
+        // -- == Comentários
+        if (token == "--") {
+            continue;
+        }
+
+        else if (token == "view") {
+            float WIDTH, HEIGHT;
+            sline >> WIDTH >> HEIGHT;
+
+            glViewport(0, 0, WIDTH, HEIGHT);
+        }
+
+        else if (token == "obj") {
             if (!firstObj) {
                 objects.push_back(obj);
-                obj = new Obj3D(); // <-- corrige o escopo do ponteiro
+                obj = new Obj3D();
             }
 
             firstObj = false;
@@ -68,7 +80,7 @@ vector<Obj3D*> SceneReader::getObjects(string content) {
 
             if (objData.empty()) {
                 std::cerr << "[ERRO] Arquivo OBJ vazio ou não encontrado: " << path << std::endl;
-                continue; // pula essa iteração se o arquivo estiver inválido
+                continue;
             }
 
             obj->mesh = objReader.readMesh(objData);
@@ -94,14 +106,13 @@ vector<Obj3D*> SceneReader::getObjects(string content) {
         }
 
         else if (token == "del") {
-            int value;
+            bool value;
             sline >> value;
 
-            obj->deletable = (value == 1);
+            obj->deletable = value;
         }
     }
 
-    // Adiciona o último objeto se for válido
     if (!firstObj) {
         objects.push_back(obj);
     }
