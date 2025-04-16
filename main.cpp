@@ -88,7 +88,7 @@ int main() {
 
 	glUseProgram(shaderProgram);
 
-	Camera camera = Camera(WIDTH, HEIGHT, shaderProgram);
+	Camera camera = Camera(WIDTH, HEIGHT, shaderProgram, 0.005f);
 	
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

@@ -7,7 +7,7 @@
 
 class Camera {
 public:
-	Camera(float WIDTH, float HEIGHT, GLuint shaderProgram);
+	Camera(float WIDTH, float HEIGHT, GLuint shaderProgram, float cameraSpeed);
 	~Camera();
 
 	glm::vec3 position;
@@ -15,7 +15,7 @@ public:
 	glm::vec3 direction;
 	glm::vec3 up;
 	glm::vec3 right;
-	GLfloat speed = 0.005f;
+	float speed;
 	glm::mat4 view;
 	glm::mat4 proj;
 	int viewLocation;

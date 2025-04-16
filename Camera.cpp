@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-Camera::Camera(float WIDTH, float HEIGHT, GLuint shaderProgram) {
+Camera::Camera(float WIDTH, float HEIGHT, GLuint shaderProgram, float cameraSpeed) {
 	position = glm::vec3(0.0f, 0.0f, 3.0f);
 
 	target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -10,7 +10,7 @@ Camera::Camera(float WIDTH, float HEIGHT, GLuint shaderProgram) {
 	right = glm::normalize(glm::cross(up, direction));
 
 	up = glm::cross(direction, right);
-	speed = 0.005f;
+	speed = cameraSpeed;
 
 	viewLocation = glGetUniformLocation(shaderProgram, "view");
 
