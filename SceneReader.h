@@ -1,5 +1,5 @@
 #pragma once
-#include"Obj3D.h";
+#include"Obj3D.h"
 
 class SceneReader {
 	public:

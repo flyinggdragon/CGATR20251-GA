@@ -36,6 +36,12 @@ const char* fShader =
 "   frag_color = vec4(1.0, 1.0, 1.0, 1.0);"
 "}";
 
+Camera* camera = nullptr;
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
+	camera->ProcessMouseMovement(xpos, ypos);
+}
+
 int main() {
 	if (!glfwInit()) {
 		cerr << "Falha ao inicializar GLFW" << endl;
@@ -88,29 +94,17 @@ int main() {
 
 	glUseProgram(shaderProgram);
 
-	Camera camera = Camera(WIDTH, HEIGHT, shaderProgram, 0.005f);
-	
+	camera = new Camera(WIDTH, HEIGHT, shaderProgram, 0.005f, 0.2f);
+	glfwSetCursorPosCallback(window, mouseCallback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera.position += camera.speed * camera.direction;
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera.position -= camera.speed * camera.direction;
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera.position -= camera.right * camera.speed;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera.position += camera.right * camera.speed;
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, true);
-		
-		camera.target = camera.position + camera.direction;
-
-		camera.view = glm::lookAt(camera.position, camera.target, camera.up);
-		glUniformMatrix4fv(camera.viewLocation, 1, GL_FALSE, glm::value_ptr(camera.view));
-
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+		camera->ProcessInput(window);
 
 		for (Obj3D* obj : objects) {
 			int matrixLocation = glGetUniformLocation(shaderProgram, "transform");

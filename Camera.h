@@ -7,8 +7,10 @@
 
 class Camera {
 public:
-	Camera(float WIDTH, float HEIGHT, GLuint shaderProgram, float cameraSpeed);
+	Camera(float WIDTH, float HEIGHT, GLuint shaderProgram, float cameraSpeed, float camSensitivity);
 	~Camera();
+	void ProcessMouseMovement(double xpos, double ypos);
+	void ProcessInput(GLFWwindow* window);
 
 	glm::vec3 position;
 	glm::vec3 target;
@@ -18,6 +20,15 @@ public:
 	float speed;
 	glm::mat4 view;
 	glm::mat4 proj;
+	float yaw = -90.0f;
+	float pitch = 0.0f;
+	float sensitivity;
+	float firstMouse = true;
+	double lastX;
+	double lastY;
 	int viewLocation;
 	int projLocation;
+
+private:
+	void UpdateDirection();
 };
