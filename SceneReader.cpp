@@ -15,7 +15,7 @@ SceneReader::SceneReader() { }
 
 SceneReader::~SceneReader() { }
 
-string SceneReader::readScene(string path) {
+string SceneReader::ReadScene(string path) {
     ifstream inputFile;
     inputFile.open(path);
 
@@ -34,7 +34,7 @@ string SceneReader::readScene(string path) {
     return content;
 }
 
-vector<Obj3D*> SceneReader::getObjects(string content) {
+vector<Obj3D*> SceneReader::GetObjects(string content) {
     vector<Obj3D*> objects;
 
     Obj3D* obj = new Obj3D();
@@ -76,14 +76,14 @@ vector<Obj3D*> SceneReader::getObjects(string content) {
             string path;
             sline >> path;
 
-            string objData = objReader.readObj(path);
+            string objData = objReader.ReadObj(path);
 
             if (objData.empty()) {
                 std::cerr << "[ERRO] Arquivo OBJ vazio ou não encontrado: " << path << std::endl;
                 continue;
             }
 
-            obj->mesh = objReader.readMesh(objData);
+            obj->mesh = objReader.ReadMesh(objData);
 
             if (obj->mesh == nullptr) {
                 std::cerr << "[ERRO] Falha ao criar mesh para o arquivo: " << path << std::endl;
@@ -106,10 +106,10 @@ vector<Obj3D*> SceneReader::getObjects(string content) {
         }
 
         else if (token == "del") {
-            bool value;
+            int value;
             sline >> value;
 
-            obj->deletable = value;
+            obj->deletable = value == 1;
         }
     }
 

@@ -14,7 +14,7 @@ ObjReader::ObjReader() { }
 
 ObjReader::~ObjReader() { }
 
-Mesh* ObjReader::readMesh(string content) {
+Mesh* ObjReader::ReadMesh(string content) {
     Mesh* mesh = new Mesh;
     Group* group = new Group();
     bool firstGroup = true;
@@ -27,12 +27,7 @@ Mesh* ObjReader::readMesh(string content) {
         string token;
         sline >> token;
 
-        if (token == "v") {
-            float x, y, z;
-            sline >> x >> y >> z;
-            mesh->vertices.push_back(glm::vec3(x, y, z));
-        }
-        else if (token == "g") {
+        if (token == "g") {
             if (!firstGroup) {
                 mesh->groups.push_back(group);
                 group = new Group();
@@ -40,6 +35,21 @@ Mesh* ObjReader::readMesh(string content) {
             firstGroup = false;
             sline >> group->name;
         }
+
+        else if (token == "v") {
+            float x, y, z;
+            sline >> x >> y >> z;
+            mesh->vertices.push_back(glm::vec3(x, y, z));
+        }
+
+        else if (token == "vn") {
+            float x, y, z;
+            sline >> x >> y >> z;
+
+            glm::vec3 vn = glm::vec3(x, y, z);
+            mesh->normals.push_back(vn);
+        }
+
         else if (token == "f") {
             Face* face = new Face();
             string vertexData;
@@ -55,12 +65,13 @@ Mesh* ObjReader::readMesh(string content) {
     }
 
     mesh->groups.push_back(group);
-    genGroupObjects(group, mesh);
+
+    GenGroupObjects(group, mesh);
 
     return mesh;
 }
 
-string ObjReader::readObj(string path) {
+string ObjReader::ReadObj(string path) {
     ifstream inputFile;
     inputFile.open(path);
 
@@ -79,7 +90,7 @@ string ObjReader::readObj(string path) {
     return content;
 };
 
-void ObjReader::genGroupObjects(Group* group, Mesh* mesh) {
+void ObjReader::GenGroupObjects(Group* group, Mesh* mesh) {
     vector<GLfloat> vertices;
 
     for (Face* f : group->faces) {

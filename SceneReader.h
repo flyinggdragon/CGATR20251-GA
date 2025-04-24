@@ -5,6 +5,6 @@ class SceneReader {
 	public:
 		SceneReader();
 		~SceneReader();
-		string readScene(string path);
-		vector<Obj3D*> getObjects(string content);
+		string ReadScene(string path);
+		vector<Obj3D*> GetObjects(string content);
 };

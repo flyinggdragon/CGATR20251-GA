@@ -8,8 +8,14 @@ class Obj3D {
 public:
 	string name;
 	Mesh* mesh;
-	glm::mat4 transform = glm::mat4(1.0f);
+	glm::mat4 transform;
 	int status;
 	bool deletable;
 	glm::vec3 direction;
+	glm::vec3 center;
+	float radius;
+
+	Obj3D();
+	~Obj3D();
+	void ScaleObj();
 };

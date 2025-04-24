@@ -141,6 +141,7 @@
     <ClCompile Include="Obj3D.cpp" />
     <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="SceneReader.cpp" />
+    <ClCompile Include="Shot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="Obj3D.h" />
     <ClInclude Include="ObjReader.h" />
     <ClInclude Include="SceneReader.h" />
+    <ClInclude Include="Shot.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cena.scene" />
