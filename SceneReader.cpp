@@ -11,9 +11,11 @@
 
 using namespace std;
 
-SceneReader::SceneReader() { }
+SceneReader::SceneReader() {
+}
 
-SceneReader::~SceneReader() { }
+SceneReader::~SceneReader() {
+}
 
 string SceneReader::ReadScene(string path) {
     ifstream inputFile;
@@ -35,6 +37,7 @@ string SceneReader::ReadScene(string path) {
 }
 
 vector<Obj3D*> SceneReader::GetObjects(string content) {
+    // Faz a leitura da cena.
     vector<Obj3D*> objects;
 
     Obj3D* obj = new Obj3D();
@@ -55,23 +58,23 @@ vector<Obj3D*> SceneReader::GetObjects(string content) {
             continue;
         }
 
+        // Viewport
         else if (token == "view") {
             float WIDTH, HEIGHT;
             sline >> WIDTH >> HEIGHT;
 
             glViewport(0, 0, WIDTH, HEIGHT);
         }
-
+        
+        // Novo objeto.
         else if (token == "obj") {
             if (!firstObj) {
                 objects.push_back(obj);
                 obj = new Obj3D();
             }
-
-            firstObj = false;
-            sline >> obj->name;
         }
 
+        // Localização do objeto.
         else if (token == "loc") {
             string path;
             sline >> path;
@@ -82,22 +85,36 @@ vector<Obj3D*> SceneReader::GetObjects(string content) {
                 std::cerr << "[ERRO] Arquivo OBJ vazio ou não encontrado: " << path << std::endl;
                 continue;
             }
-
+            
+            // Lê o mesh.
             obj->mesh = objReader.ReadMesh(objData);
 
             if (obj->mesh == nullptr) {
                 std::cerr << "[ERRO] Falha ao criar mesh para o arquivo: " << path << std::endl;
                 continue;
             }
+
+            obj->mesh->GenMinMax();
+
+            // Normaliza para caber no frustum.
+            obj->ScaleObj();
+
+            obj->center = obj->mesh->DetermineCenter();
+            obj->radius = obj->mesh->GetDiameter() / 2;
+
+            firstObj = false;
+            sline >> obj->name;
         }
 
-        else if (token == "sca") {
-            float x, y, z;
-            sline >> x >> y >> z;
+        // Rotação do objeto.
+        else if (token == "rot") {
+            float angle, x, y, z;
+            sline >> angle >> x >> y >> z;
 
-            obj->transform = glm::scale(obj->transform, glm::vec3(x, y, z));
+            obj->transform = glm::rotate(obj->transform, glm::radians(angle), glm::vec3(x, y, z));
         }
 
+        // Posição do objeto.
         else if (token == "pos") {
             float x, y, z;
             sline >> x >> y >> z;
@@ -105,6 +122,7 @@ vector<Obj3D*> SceneReader::GetObjects(string content) {
             obj->transform = glm::translate(obj->transform, glm::vec3(x, y, z));
         }
 
+        // Define se o objeto é apagável.
         else if (token == "del") {
             int value;
             sline >> value;

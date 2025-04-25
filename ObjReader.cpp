@@ -14,6 +14,7 @@ ObjReader::ObjReader() { }
 
 ObjReader::~ObjReader() { }
 
+// Faz a leitura da malha.
 Mesh* ObjReader::ReadMesh(string content) {
     Mesh* mesh = new Mesh;
     Group* group = new Group();
@@ -27,6 +28,7 @@ Mesh* ObjReader::ReadMesh(string content) {
         string token;
         sline >> token;
 
+        // Grupo.
         if (token == "g") {
             if (!firstGroup) {
                 mesh->groups.push_back(group);
@@ -36,12 +38,14 @@ Mesh* ObjReader::ReadMesh(string content) {
             sline >> group->name;
         }
 
+        // Vértices.
         else if (token == "v") {
             float x, y, z;
             sline >> x >> y >> z;
             mesh->vertices.push_back(glm::vec3(x, y, z));
         }
 
+        // Normais.
         else if (token == "vn") {
             float x, y, z;
             sline >> x >> y >> z;
@@ -50,6 +54,7 @@ Mesh* ObjReader::ReadMesh(string content) {
             mesh->normals.push_back(vn);
         }
 
+        // Faces.
         else if (token == "f") {
             Face* face = new Face();
             string vertexData;
@@ -66,6 +71,7 @@ Mesh* ObjReader::ReadMesh(string content) {
 
     mesh->groups.push_back(group);
 
+    // Gera os VAOs de cada grupo.
     GenGroupObjects(group, mesh);
 
     return mesh;
@@ -90,6 +96,7 @@ string ObjReader::ReadObj(string path) {
     return content;
 };
 
+// Gera os VAOs de cada grupo.
 void ObjReader::GenGroupObjects(Group* group, Mesh* mesh) {
     vector<GLfloat> vertices;
 

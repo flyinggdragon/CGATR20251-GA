@@ -36,14 +36,19 @@ Shot::~Shot() {
     shotObj = nullptr;
 }
 
+// Cuida da movimentação do tiro.
 void Shot::Update(float deltaTime) {
+    // Aplica a direção multiplicado pela velocidade e deltaTime.
     position += direction * speed * deltaTime;
 
     transform = glm::mat4(1.0f);
+    
+    // Translada e escala.
     transform = glm::translate(transform, position);
     transform = glm::scale(transform, glm::vec3(0.5f));
 }
 
+// Lida com a reflexão do tiro.
 void Shot::Reflect(Obj3D* obj) {
     glm::vec3 objCenter = glm::vec3(obj->transform * glm::vec4(0, 0, 0, 1));
     glm::vec3 shotCenter = glm::vec3(transform * glm::vec4(0, 0, 0, 1));
@@ -64,6 +69,7 @@ void Shot::Reflect(Obj3D* obj) {
     }
 }
 
+// Cria a esfera do tiro.
 Obj3D* Shot::GenSphere() {
     const int sectorCount = 24;
     const int stackCount = 16;

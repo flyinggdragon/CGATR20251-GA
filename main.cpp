@@ -40,6 +40,7 @@ const char* fShader =
 Camera* camera = nullptr;
 Shot* shot = nullptr;
 
+// Protótipos de função.
 bool CollisionCheck(Obj3D* obj, Shot* shot);
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos) {
@@ -47,12 +48,12 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 int main() {
+	// Configurações do OpenGL
 	if (!glfwInit()) {
 		cerr << "Falha ao inicializar GLFW" << endl;
 		return -1;
 	}
 
-	// Configura��es do OpenGL
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -76,19 +77,14 @@ int main() {
 		return -1;
 	}
 
+	// Instancia o leitor de cena e importa as informações do arquivo de cena.
 	SceneReader sceneReader = SceneReader();
 	string sceneData = sceneReader.ReadScene("C:\\Users\\Acer\\Documents\\GitHub\\CGATR20251\\GrauA\\cena.scene");
+	
+	// Após isso, carrega este vetor com os objetos que serão colocados em cena.
 	vector<Obj3D*> objects = sceneReader.GetObjects(sceneData);
 
-	for (Obj3D* obj : objects) {
-		obj->mesh->GenMinMax();
-		obj->ScaleObj();
-		obj->mesh->GenMinMax();
-
-		obj->center = obj->mesh->DetermineCenter();
-		obj->radius = obj->mesh->GetDiameter() / 2;
-	}
-
+	// Configuração dos shaders.
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vShader, nullptr);
 	glCompileShader(vertexShader);
@@ -107,13 +103,15 @@ int main() {
 
 	glUseProgram(shaderProgram);
 
+	Obj3D* shotObj;
+
+	// Cria a câmera.
 	camera = new Camera(WIDTH, HEIGHT, shaderProgram, 0.005f, 0.2f);
 	glfwSetCursorPosCallback(window, MouseCallback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	Obj3D* shotObj{};
-
+	// Variáveis relacionadas ao tiro.
 	float currentFrame = 0.0f, deltaTime = 0.0f, lastFrame = 0.0f;
 	float shotLifetimeInSeconds = 2.5f, shotDurationInSeconds = 2.5f;
 
@@ -126,42 +124,51 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
+		// Varre por todos os objetos que devem ser carregados para a cena.
 		for (int i = 0; i < objects.size(); ++i) {
 			Obj3D* obj = objects[i];
 
-			if (obj->name == "cube") shotObj = obj;
-
+			// Envia a matriz de transformação do objeto para o vertex shader.
 			int matrixLocation = glGetUniformLocation(shaderProgram, "transform");
 			glUniformMatrix4fv(matrixLocation, 1, GL_FALSE, glm::value_ptr(obj->transform));
 
+			// Por fim, desenha o objeto em tela, grupo por grupo.
 			for (Group* g : obj->mesh->groups) {
 				glBindVertexArray(g->VAO);
 				glDrawArrays(GL_TRIANGLES, 0, g->numVertices);
 			}
 		}
 
+		// Movimentação da câmera
 		camera->ProcessInput(window);
 
+		// Instancia o tiro ao apertar SPACE, somente se não houver outro tiro em tela.
 		if (!shot && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 			shot = new Shot(camera->position, camera->front);
 		}
 
+		// Se o tiro estiver em tela...
 		if (shot) {
+			// Atualiza sua posição.
 			shot->Update(deltaTime);
 
+			// Envia a matriz de transformação ao shader.
 			int shotMatrixLocation = glGetUniformLocation(shaderProgram, "transform");
 			glUniformMatrix4fv(shotMatrixLocation, 1, GL_FALSE, glm::value_ptr(shot->transform));
 
+			// Desenha o tiro em tela.
 			for (Group* g : shot->shotObj->mesh->groups) {
 				glBindVertexArray(g->VAO);
 				glDrawElements(GL_TRIANGLES, g->numVertices, GL_UNSIGNED_INT, 0);
 			}
 
+			// Decrementa o timer de lifetime.
 			shotLifetimeInSeconds -= deltaTime;
 
 			for (int i = 0; i < objects.size();) {
 				Obj3D* obj = objects[i];
 
+				// Verifica a colisão para cada objeto em cena e exclui/reflete de acordo.
 				if (CollisionCheck(obj, shot)) {
 					if (obj->deletable) {
 						delete obj;
@@ -176,6 +183,7 @@ int main() {
 				++i;
 			}
 
+			// Se o lifetime acabar, exclui o tiro e reseta o tempo.
 			if (shotLifetimeInSeconds < 0.0f) {
 				delete shot;
 				shot = nullptr;
@@ -196,6 +204,7 @@ int main() {
 	return 0;
 }
 
+// Verifica a colisão.
 bool CollisionCheck(Obj3D* obj, Shot* shot) {
 	glm::vec3 objMinWorld = glm::vec3(obj->transform * glm::vec4(obj->mesh->min, 1.0f));
 	glm::vec3 objMaxWorld = glm::vec3(obj->transform * glm::vec4(obj->mesh->max, 1.0f));
@@ -209,66 +218,3 @@ bool CollisionCheck(Obj3D* obj, Shot* shot) {
 
 	return collisionX && collisionY && collisionZ;
 }
-
-/*
-GLuint CreateBoundingBoxVAO(const glm::vec3& min, const glm::vec3& max, GLuint& VBO) {
-	glm::vec3 corners[8] = {
-		{min.x, min.y, min.z},
-		{max.x, min.y, min.z},
-		{max.x, max.y, min.z},
-		{min.x, max.y, min.z},
-		{min.x, min.y, max.z},
-		{max.x, min.y, max.z},
-		{max.x, max.y, max.z},
-		{min.x, max.y, max.z},
-	};
-
-	GLuint indices[] = {
-		0,1, 1,2, 2,3, 3,0, // bottom
-		4,5, 5,6, 6,7, 7,4, // top
-		0,4, 1,5, 2,6, 3,7  // sides
-	};
-
-	std::vector<glm::vec3> lines;
-	for (int i = 0; i < 24; i++) {
-		lines.push_back(corners[indices[i]]);
-	}
-
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, lines.size() * sizeof(glm::vec3), lines.data(), GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-
-	glBindVertexArray(0);
-	return VAO;
-}
-
-vector<GLuint> bboxVAOs(objects.size());
-vector<GLuint> bboxVBOs(objects.size());
-
-GLuint shotBBoxVAO, shotBBoxVBO;
-shotBBoxVAO = createBoundingBoxVAO(
-	shot->shotObj->mesh->min,
-	shot->shotObj->mesh->max,
-	shotBBoxVBO
-);
-
-bboxVAOs[i] = CreateBoundingBoxVAO(obj->mesh->min, obj->mesh->max, bboxVBOs[i]);
-
-glBindVertexArray(bboxVAOs[i]);
-glDrawArrays(GL_LINES, 0, 24);
-
-glUniformMatrix4fv(shotMatrixLocation, 1, GL_FALSE, glm::value_ptr(shot->transform));
-
-glBindVertexArray(shotBBoxVAO);
-glDrawArrays(GL_LINES, 0, 24);
-
-glDeleteVertexArrays(1, &shotBBoxVAO);
-glDeleteBuffers(1, &shotBBoxVBO);
-*/

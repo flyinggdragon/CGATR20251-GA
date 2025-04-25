@@ -6,6 +6,7 @@ Mesh::Mesh() { }
 
 Mesh::~Mesh() { }
 
+// Obtém os mins e maxes da malha para a bounding-box.
 void Mesh::GenMinMax() {
     for (Group* g : groups) {
         for (Face* f : g->faces) {
