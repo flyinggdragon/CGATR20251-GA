@@ -10,9 +10,11 @@
 
 using namespace std;
 
-ObjReader::ObjReader() { }
+ObjReader::ObjReader() {
+}
 
-ObjReader::~ObjReader() { }
+ObjReader::~ObjReader() {
+}
 
 // Faz a leitura da malha.
 Mesh* ObjReader::ReadMesh(string content) {
@@ -98,7 +100,7 @@ string ObjReader::ReadObj(string path) {
 
 // Gera os VAOs de cada grupo.
 void ObjReader::GenGroupObjects(Group* group, Mesh* mesh) {
-    vector<GLfloat> vertices;
+    std::vector<GLfloat> vertices;
 
     for (Face* f : group->faces) {
         for (int i = 0; i < f->verts.size(); i++) {
@@ -106,8 +108,27 @@ void ObjReader::GenGroupObjects(Group* group, Mesh* mesh) {
             vertices.push_back(v.x);
             vertices.push_back(v.y);
             vertices.push_back(v.z);
-            group->numVertices++;
+
+            // Se houver normal, adiciona
+            if (i < f->norms.size()) {
+                glm::vec3 n = mesh->normals[f->norms[i]];
+                vertices.push_back(n.x);
+                vertices.push_back(n.y);
+                vertices.push_back(n.z);
+            }
+            else {
+                // Se não houver normal, coloca uma normal fake para evitar erro
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
+                vertices.push_back(1.0f);
+            }
+
+            // Cor opcional: definir uma cor fixa ou randômica por vértice
+            vertices.push_back(0.9f); // R
+            vertices.push_back(0.52f); // G
+            vertices.push_back(0.33f); // B
         }
+        group->numVertices += f->verts.size();
     }
 
     GLuint VAO;
@@ -120,8 +141,19 @@ void ObjReader::GenGroupObjects(Group* group, Mesh* mesh) {
     glBufferData(GL_ARRAY_BUFFER, (vertices.size() * sizeof(GLfloat)),
                  vertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    GLsizei stride = 9 * sizeof(float);
+
+    // Posição
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
+
+    // Normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // Cor
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     group->VAO = VAO;
     group->VBO = VBO;
